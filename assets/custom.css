@@ -1,0 +1,318 @@
+/* ── Comm Prices – custom.css ───────────────────────────── */
+
+/* Fonte */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap');
+
+body {
+    font-family: 'Inter', sans-serif !important;
+    background-color: #0d1117 !important;
+}
+
+/* ── Cards de preço ── */
+.price-card {
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 12px;
+    padding: 18px 20px;
+    transition: border-color 0.2s, transform 0.15s;
+    cursor: default;
+    position: relative;
+    overflow: hidden;
+}
+
+.price-card:hover {
+    border-color: #58a6ff;
+    transform: translateY(-2px);
+}
+
+.price-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, #1f6feb, #388bfd);
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.price-card:hover::before { opacity: 1; }
+
+.card-icon {
+    font-size: 11px;
+    font-weight: 700;
+    font-family: 'JetBrains Mono', monospace;
+    color: #58a6ff;
+    background: #1f2d3d;
+    padding: 3px 8px;
+    border-radius: 6px;
+    letter-spacing: 0.5px;
+}
+
+.card-name {
+    font-size: 13px;
+    font-weight: 500;
+    color: #8b949e;
+    margin-top: 6px;
+}
+
+.card-price {
+    font-size: 22px;
+    font-weight: 700;
+    font-family: 'JetBrains Mono', monospace;
+    color: #e6edf3;
+    margin-top: 8px;
+    letter-spacing: -0.5px;
+    min-height: 32px;
+}
+
+.card-change {
+    font-size: 13px;
+    font-weight: 500;
+    margin-top: 4px;
+}
+
+.change-pos { color: #3fb950; }
+.change-neg { color: #f85149; }
+.change-neu { color: #8b949e; }
+
+.card-timestamp {
+    font-size: 10px;
+    color: #484f58;
+    margin-top: 8px;
+    font-family: 'JetBrains Mono', monospace;
+}
+
+.remove-btn {
+    position: absolute;
+    top: 10px; right: 10px;
+    background: none;
+    border: none;
+    color: #484f58;
+    font-size: 16px;
+    cursor: pointer;
+    line-height: 1;
+    padding: 2px 5px;
+    border-radius: 4px;
+    transition: color 0.15s, background 0.15s;
+}
+
+.remove-btn:hover {
+    color: #f85149;
+    background: #2d1b1b;
+}
+
+/* ── Header ── */
+.app-header {
+    background: #161b22;
+    border-bottom: 1px solid #30363d;
+    padding: 16px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.app-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: #e6edf3;
+    letter-spacing: -0.5px;
+}
+
+.app-subtitle {
+    font-size: 12px;
+    color: #484f58;
+    margin-top: 2px;
+}
+
+/* ── Toggle de moeda ── */
+.currency-toggle {
+    display: flex;
+    align-items: center;
+    background: #21262d;
+    border: 1px solid #30363d;
+    border-radius: 8px;
+    padding: 4px;
+    gap: 4px;
+}
+
+.currency-btn {
+    padding: 6px 18px;
+    border-radius: 6px;
+    border: none;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: 'JetBrains Mono', monospace;
+}
+
+.currency-btn.active {
+    background: #1f6feb;
+    color: #fff;
+}
+
+.currency-btn.inactive {
+    background: transparent;
+    color: #8b949e;
+}
+
+.currency-btn:hover:not(.active) {
+    background: #30363d;
+    color: #e6edf3;
+}
+
+/* ── Seção de gráfico ── */
+.chart-controls {
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 12px;
+    padding: 20px 24px;
+    margin-bottom: 16px;
+}
+
+.section-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #8b949e;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 16px;
+}
+
+/* Botões de período */
+.period-btn {
+    font-size: 12px;
+    font-weight: 600;
+    padding: 5px 12px;
+    border: 1px solid #30363d;
+    border-radius: 6px;
+    background: transparent;
+    color: #8b949e;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-family: 'JetBrains Mono', monospace;
+}
+
+.period-btn.active, .period-btn:hover {
+    background: #1f6feb;
+    border-color: #1f6feb;
+    color: #fff;
+}
+
+/* ── Indicadores ── */
+.indicator-toggle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    border: 1px solid #30363d;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.15s;
+    background: transparent;
+    color: #8b949e;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.indicator-toggle.active {
+    border-color: #388bfd;
+    background: #1a2840;
+    color: #58a6ff;
+}
+
+/* ── Modal adicionar ativo ── */
+.add-modal .modal-content {
+    background: #161b22 !important;
+    border: 1px solid #30363d !important;
+    border-radius: 12px !important;
+}
+
+.add-modal .modal-header {
+    border-bottom: 1px solid #30363d !important;
+    padding: 20px 24px !important;
+}
+
+.add-modal .modal-title {
+    color: #e6edf3 !important;
+    font-weight: 600 !important;
+}
+
+.add-modal .modal-body {
+    padding: 24px !important;
+}
+
+.add-modal .form-label {
+    color: #8b949e;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.add-modal .form-control,
+.add-modal .form-select {
+    background: #0d1117 !important;
+    border: 1px solid #30363d !important;
+    color: #e6edf3 !important;
+    border-radius: 8px !important;
+}
+
+.add-modal .form-control:focus,
+.add-modal .form-select:focus {
+    border-color: #388bfd !important;
+    box-shadow: 0 0 0 3px rgba(56, 139, 253, 0.15) !important;
+}
+
+/* ── Dropdown Dash ── */
+.Select-control {
+    background-color: #21262d !important;
+    border-color: #30363d !important;
+    color: #e6edf3 !important;
+    border-radius: 8px !important;
+}
+
+.Select-menu-outer {
+    background-color: #161b22 !important;
+    border-color: #30363d !important;
+}
+
+.Select-option {
+    background-color: #161b22 !important;
+    color: #e6edf3 !important;
+}
+
+.Select-option:hover, .Select-option.is-focused {
+    background-color: #21262d !important;
+}
+
+.Select-value-label { color: #e6edf3 !important; }
+.Select-placeholder { color: #484f58 !important; }
+.Select-arrow { border-top-color: #8b949e !important; }
+
+/* ── Status bar ── */
+.status-bar {
+    font-size: 11px;
+    color: #484f58;
+    font-family: 'JetBrains Mono', monospace;
+    padding: 8px 32px;
+    border-top: 1px solid #21262d;
+}
+
+.status-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: #3fb950;
+    display: inline-block;
+    margin-right: 6px;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0.4; }
+}
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #0d1117; }
+::-webkit-scrollbar-thumb { background: #30363d; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #484f58; }
