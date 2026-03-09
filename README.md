@@ -2,7 +2,7 @@
 
 Dashboard pra acompanhar preços de ativos em tempo real. Roda local, abre no browser.
 
-![screenshot](images/Index.png)
+![](Images/Index.png)
 
 ## O que tem
 
