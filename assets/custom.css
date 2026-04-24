@@ -422,3 +422,137 @@ body {
 #dd-sim-asset .Select-value-label {
     color: #000000 !important;
 }
+
+/* ─────────────────────────────────────────────────────────────
+   RESPONSIVO – Mobile (iPhone e telas até 768px)
+───────────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+
+    /* ── Header ── */
+    .app-header {
+        padding: 12px 16px;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .app-title  { font-size: 16px; }
+    .app-subtitle { font-size: 11px; }
+
+    /* Botões do header em linha compacta */
+    .app-header > div:last-child {
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    /* ── Tabs ── */
+    .main-tabs,
+    .nav-tabs {
+        padding: 0 16px !important;
+    }
+
+    .nav-tabs .nav-link {
+        padding: 8px 12px !important;
+        font-size: 12px;
+    }
+
+    /* ── Seção de preços ── */
+    [style*="padding: 28px 32px"] {
+        padding: 16px !important;
+    }
+
+    /* Grid de cards: 2 por linha no mobile */
+    #price-cards-container {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 10px !important;
+    }
+
+    .price-card {
+        padding: 12px 14px;
+    }
+
+    .card-price {
+        font-size: 17px;
+    }
+
+    .card-name  { font-size: 12px; }
+    .card-change { font-size: 12px; }
+
+    /* ── Seção de gráfico: empilha controles acima do gráfico ── */
+    .row > [class*="col-3"],
+    .row > [class*="col-md-3"] {
+        width: 100% !important;
+        max-width: 100% !important;
+        flex: 0 0 100% !important;
+    }
+
+    .row > [class*="col-9"],
+    .row > [class*="col-md-9"] {
+        width: 100% !important;
+        max-width: 100% !important;
+        flex: 0 0 100% !important;
+    }
+
+    .chart-controls {
+        padding: 14px 16px;
+        margin-bottom: 12px;
+    }
+
+    /* Gráfico com altura menor no mobile */
+    #main-chart {
+        height: 340px !important;
+    }
+
+    /* Botões de período menores */
+    .period-btn {
+        font-size: 11px;
+        padding: 4px 8px;
+    }
+
+    /* ── Status bar ── */
+    .status-bar {
+        padding: 6px 16px;
+        font-size: 10px;
+    }
+
+    /* ── Modal full-screen no mobile ── */
+    .add-modal .modal-dialog,
+    .modal-dialog {
+        margin: 0 !important;
+        max-width: 100% !important;
+        width: 100% !important;
+    }
+
+    .add-modal .modal-content,
+    .modal-content {
+        border-radius: 0 !important;
+        min-height: 100dvh;
+    }
+
+    .add-modal .modal-body {
+        padding: 16px !important;
+    }
+
+    /* ── Comm Lens modal ── */
+    .modal-xl .modal-dialog {
+        margin: 0 !important;
+        max-width: 100% !important;
+    }
+
+    /* ── Métricas do Comm Lens: 2 colunas ── */
+    .metrics-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+
+    /* ── Rentabilidade do período: quebra em mobile ── */
+    #chart-return-info {
+        font-size: 11px !important;
+        word-break: break-word;
+    }
+
+    /* ── Toggle de moeda ── */
+    .currency-btn {
+        padding: 5px 12px;
+        font-size: 12px;
+    }
+}
+
