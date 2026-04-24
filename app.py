@@ -301,6 +301,12 @@ def _chart_section():
 
             # ── Gráfico ────────────────────────────
             dbc.Col(width=9, children=[
+                html.Div(id="chart-return-info", style={
+                    "fontSize": "13px",
+                    "fontFamily": "JetBrains Mono, monospace",
+                    "marginBottom": "8px",
+                    "minHeight": "20px",
+                }),
                 dcc.Graph(
                     id="main-chart",
                     config={
@@ -619,7 +625,8 @@ def update_price_cards(_, currency, assets):
         )
 
     import datetime as dt
-    now_str = dt.datetime.now().strftime("%H:%M:%S")
+    from zoneinfo import ZoneInfo
+    now_str = dt.datetime.now(ZoneInfo("America/Sao_Paulo")).strftime("%H:%M:%S")
     status  = f"Última atualização: {now_str}  ·  {len(assets)} ativo(s)"
     clock   = f"🕐 {now_str}"
     return cards, status, clock
@@ -645,6 +652,7 @@ def sync_chart_dropdown(assets, current_val):
 # 6 · Gráfico principal ───────────────────────────────────────
 @app.callback(
     Output("main-chart", "figure"),
+    Output("chart-return-info", "children"),
     Input("dd-chart-asset", "value"),
     Input("period-store", "data"),
     Input("chk-indicators", "value"),
@@ -665,17 +673,17 @@ def update_chart(asset_id, period, indicators, chart_type, currency, assets):
     ))
 
     if not asset_id or not assets:
-        return fig_empty
+        return fig_empty, ""
 
     asset = next((a for a in assets if a["id"] == asset_id), None)
     if asset is None:
-        return fig_empty
+        return fig_empty, ""
 
     p_cfg   = PERIODS.get(period or "1M", PERIODS["1M"])
     df = get_history(asset, p_cfg["yf_period"], p_cfg["yf_interval"])
 
     if df.empty:
-        return fig_empty
+        return fig_empty, ""
 
     indicators = indicators or []
     show_bb    = "bb"  in indicators
@@ -826,7 +834,38 @@ def update_chart(asset_id, period, indicators, chart_type, currency, assets):
     if show_rsi:
         fig.update_yaxes(title_text="RSI", row=2, col=1, range=[0, 100])
 
-    return fig
+    # ── Rentabilidade do período ────────────────────────────────
+    try:
+        _close_series = df["Close"].dropna()
+        _p_start = float(_close_series.iloc[0])
+        _p_end   = float(_close_series.iloc[-1])
+        _d_start = _close_series.index[0]
+        _d_end   = _close_series.index[-1]
+        _chg_abs = _p_end - _p_start
+        _chg_pct = (_p_end / _p_start - 1) * 100 if _p_start != 0 else 0.0
+        _sym     = "R$" if (display_brl or asset["base_currency"] == "BRL") else "US$"
+        _unit    = "g" if asset.get("gram_convert") else "un."
+        _color   = "#3fb950" if _chg_abs >= 0 else "#f85149"
+        _sign    = "+" if _chg_abs >= 0 else ""
+        _fmt_price = lambda v: f"{_sym} {v:,.2f}/{_unit}"
+        _fmt_date  = lambda d: d.strftime("%d/%m %H:%M") if hasattr(d, "strftime") else str(d)
+        _return_info = html.Span([
+            html.Span(f"{_fmt_price(_p_start)}", style={"color": "#8b949e"}),
+            html.Span("  →  ", style={"color": "#484f58"}),
+            html.Span(f"{_fmt_price(_p_end)}", style={"color": _color}),
+            html.Span(
+                f"  {_sign}{_sym} {abs(_chg_abs):,.2f}  ({_sign}{_chg_pct:.2f}%)",
+                style={"color": _color, "fontWeight": "600"},
+            ),
+            html.Span(
+                f"  ·  {_fmt_date(_d_start)} → {_fmt_date(_d_end)}",
+                style={"color": "#484f58"},
+            ),
+        ])
+    except Exception:
+        _return_info = ""
+
+    return fig, _return_info
 
 
 # 7 · Modal (abrir / fechar) ──────────────────────────────────
@@ -1214,10 +1253,21 @@ def open_lens(clicks_list, assets):
                                                     "fontFamily": "JetBrains Mono, monospace"}),
                                 ],
                             ),
-                            html.Div(n["summary"],
-                                     style={"color": "#8b949e", "fontSize": "12px",
-                                            "marginTop": "5px", "lineHeight": "1.5"})
-                            if n["summary"] else html.Span(),
+                            html.Div(
+                                style={"display": "flex", "justifyContent": "space-between",
+                                       "alignItems": "flex-start", "marginTop": "5px", "gap": "12px"},
+                                children=[
+                                    html.Div(n.get("summary", ""),
+                                             style={"color": "#8b949e", "fontSize": "12px",
+                                                    "lineHeight": "1.5"})
+                                    if n.get("summary") else html.Span(),
+                                    html.Div(n.get("source", ""),
+                                             style={"color": "#3fb950", "fontSize": "11px",
+                                                    "whiteSpace": "nowrap",
+                                                    "fontFamily": "JetBrains Mono, monospace"})
+                                    if n.get("source") else html.Span(),
+                                ],
+                            ),
                         ],
                     ),
                 )
@@ -1372,10 +1422,21 @@ def open_lens(clicks_list, assets):
                                                     "fontFamily": "JetBrains Mono, monospace"}),
                                 ],
                             ),
-                            html.Div(n["summary"],
-                                     style={"color": "#8b949e", "fontSize": "12px",
-                                            "marginTop": "5px", "lineHeight": "1.5"})
-                            if n["summary"] else html.Span(),
+                            html.Div(
+                                style={"display": "flex", "justifyContent": "space-between",
+                                       "alignItems": "flex-start", "marginTop": "5px", "gap": "12px"},
+                                children=[
+                                    html.Div(n.get("summary", ""),
+                                             style={"color": "#8b949e", "fontSize": "12px",
+                                                    "lineHeight": "1.5"})
+                                    if n.get("summary") else html.Span(),
+                                    html.Div(n.get("source", ""),
+                                             style={"color": "#3fb950", "fontSize": "11px",
+                                                    "whiteSpace": "nowrap",
+                                                    "fontFamily": "JetBrains Mono, monospace"})
+                                    if n.get("source") else html.Span(),
+                                ],
+                            ),
                         ],
                     ),
                 )

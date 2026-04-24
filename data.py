@@ -153,9 +153,9 @@ def get_history(
         if df.empty:
             return pd.DataFrame()
 
-        # Remover timezone para facilitar serialização
+        # Remover timezone para facilitar serialização (converter para horário de Brasília)
         if df.index.tz is not None:
-            df.index = df.index.tz_convert("UTC").tz_localize(None)
+            df.index = df.index.tz_convert("America/Sao_Paulo").tz_localize(None)
 
         if gram_convert:
             for col in ("Open", "High", "Low", "Close"):
@@ -333,7 +333,7 @@ def get_dividend_simulation(
             return result
 
         if divs.index.tz is not None:
-            divs.index = divs.index.tz_convert("UTC").tz_localize(None)
+            divs.index = divs.index.tz_convert("America/Sao_Paulo").tz_localize(None)
 
         cutoff   = pd.Timestamp.now() - pd.DateOffset(months=12)
         divs_12m = divs[divs.index >= cutoff]
@@ -373,6 +373,41 @@ def get_dividend_simulation(
     return result
 
 
+# ─── Google News RSS ──────────────────────────────────────────
+
+def _fetch_google_news(query: str, max_items: int = 6) -> list[dict]:
+    """Busca notícias no Google News RSS pelo nome do ativo."""
+    import urllib.parse
+    import xml.etree.ElementTree as ET
+    import re as _re
+
+    q   = urllib.parse.quote(query)
+    url = f"https://news.google.com/rss/search?q={q}&hl=pt-BR&gl=BR&ceid=BR:pt"
+    try:
+        resp = requests.get(url, timeout=8, headers={"User-Agent": "Mozilla/5.0"})
+        resp.raise_for_status()
+        root  = ET.fromstring(resp.content)
+        items = root.findall("./channel/item")
+        parsed = []
+        for item in items[:max_items]:
+            title  = (item.findtext("title") or "").strip()
+            link   = (item.findtext("link")  or "").strip()
+            pub    = (item.findtext("pubDate") or "")[:16]
+            source = (item.findtext("source") or "").strip()
+            desc   = _re.sub(r"<[^>]+>", "", item.findtext("description") or "")[:220].strip()
+            if title:
+                parsed.append({
+                    "title":   title,
+                    "summary": desc,
+                    "pubDate": pub,
+                    "url":     link,
+                    "source":  source,
+                })
+        return parsed
+    except Exception:
+        return []
+
+
 # ─── Comm Lens – informações detalhadas do ativo ─────────────
 
 def get_asset_lens(asset: dict[str, Any]) -> dict[str, Any]:
@@ -398,18 +433,22 @@ def get_asset_lens(asset: dict[str, Any]) -> dict[str, Any]:
         ]
         result["info"] = {k: info[k] for k in keep if k in info and info[k] is not None}
 
-        parsed = []
-        for n in (obj.news or [])[:5]:
-            c = n.get("content", {}) if isinstance(n, dict) else {}
-            title   = c.get("title", "")
-            summary = _re.sub(r"<[^>]+>", "", c.get("summary") or c.get("description") or "")[:220]
-            pub     = (c.get("pubDate") or "")[:10]
-            url     = (
-                (c.get("canonicalUrl")    or {}).get("url") or
-                (c.get("clickThroughUrl") or {}).get("url") or ""
-            )
-            if title:
-                parsed.append({"title": title, "summary": summary, "pubDate": pub, "url": url})
+        # ── Google News RSS (fonte principal) ────────────────
+        parsed = _fetch_google_news(asset.get("name", ticker))
+
+        # ── Fallback: Yahoo Finance ───────────────────────────
+        if not parsed:
+            for n in (obj.news or [])[:5]:
+                c = n.get("content", {}) if isinstance(n, dict) else {}
+                title   = c.get("title", "")
+                summary = _re.sub(r"<[^>]+>", "", c.get("summary") or c.get("description") or "")[:220]
+                pub     = (c.get("pubDate") or "")[:10]
+                url     = (
+                    (c.get("canonicalUrl")    or {}).get("url") or
+                    (c.get("clickThroughUrl") or {}).get("url") or ""
+                )
+                if title:
+                    parsed.append({"title": title, "summary": summary, "pubDate": pub, "url": url})
 
         result["news"] = parsed
 
