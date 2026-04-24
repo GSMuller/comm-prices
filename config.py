@@ -83,7 +83,7 @@ PERIODS = {
 }
 
 # Tipos de ativo disponíveis para cadastro manual
-ASSET_TYPES = ["stock", "crypto", "commodity", "index", "etf", "outro"]
+ASSET_TYPES = ["stock", "crypto", "commodity", "index", "etf", "fii", "outro"]
 
 # Ticker de câmbio USD ↔ BRL
 FX_TICKER = "BRL=X"
@@ -91,5 +91,5 @@ FX_TICKER = "BRL=X"
 # Fallback se o câmbio não carregar
 FX_FALLBACK = 5.0
 
-# Intervalo de atualização em milissegundos (10 s)
-REFRESH_INTERVAL_MS = 10_000
+# Intervalo de atualização em milissegundos (5 minutos)
+REFRESH_INTERVAL_MS = 300_000

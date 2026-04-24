@@ -72,3 +72,10 @@ yfinance, pandas, numpy, requests
 - Seção de portfólio com valor total
 - Exportar histórico em CSV
 - Deploy no Railway/Render
+
+
+## Fazer alteracoes 
+
+qualquer alteração no codigo deve reinicar a aplicacao no servidor 
+
+sudo systemctl restart comm-prices.service

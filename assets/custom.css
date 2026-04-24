@@ -101,6 +101,26 @@ body {
     background: #2d1b1b;
 }
 
+/* ── Botão Comm Lens ── */
+.lens-btn {
+    position: absolute;
+    bottom: 10px; right: 10px;
+    background: none;
+    border: none;
+    color: #484f58;
+    font-size: 13px;
+    cursor: pointer;
+    line-height: 1;
+    padding: 2px 5px;
+    border-radius: 4px;
+    transition: color 0.15s, background 0.15s;
+}
+
+.lens-btn:hover {
+    color: #58a6ff;
+    background: #1a2840;
+}
+
 /* ── Header ── */
 .app-header {
     background: #161b22;
@@ -263,29 +283,73 @@ body {
 }
 
 /* ── Dropdown Dash ── */
+.dash-dropdown-dark .Select-control,
 .Select-control {
     background-color: #21262d !important;
     border-color: #30363d !important;
-    color: #e6edf3 !important;
     border-radius: 8px !important;
 }
 
+.dash-dropdown-dark .Select-menu-outer,
 .Select-menu-outer {
     background-color: #161b22 !important;
     border-color: #30363d !important;
+    z-index: 9999 !important;
 }
 
+.dash-dropdown-dark .Select-option,
 .Select-option {
     background-color: #161b22 !important;
     color: #e6edf3 !important;
 }
 
-.Select-option:hover, .Select-option.is-focused {
+.dash-dropdown-dark .Select-option:hover,
+.dash-dropdown-dark .Select-option.is-focused,
+.Select-option:hover,
+.Select-option.is-focused {
     background-color: #21262d !important;
+    color: #e6edf3 !important;
 }
 
-.Select-value-label { color: #e6edf3 !important; }
+/* valor selecionado */
+.dash-dropdown-dark .Select-value,
+.dash-dropdown-dark .Select-value-label,
+.dash-dropdown-dark .Select--single .Select-value,
+.dash-dropdown-dark .Select--single .Select-value-label,
+.Select-value,
+.Select-value-label,
+.Select--single .Select-value,
+.Select--single .Select-value-label,
+.Select--single > .Select-control .Select-value,
+.Select--single > .Select-control .Select-value .Select-value-label {
+    color: #000000 !important;
+}
+
+/* fallback: tudo dentro do controle do dropdown */
+#dd-chart-asset .Select-control *,
+#dd-chart-asset .Select-value,
+#dd-chart-asset .Select-value-label {
+    color: #000000 !important;
+}
+
+/* Dash novo (2.x) */
+.dash-dropdown-value,
+.dash-dropdown-value-item,
+.dash-dropdown-value span {
+    color: #000000 !important;
+}
+
+/* texto digitado na busca */
+.dash-dropdown-dark .Select-input > input,
+.Select-input > input {
+    color: #e6edf3 !important;
+    font-family: 'Inter', sans-serif !important;
+}
+
+.dash-dropdown-dark .Select-placeholder,
 .Select-placeholder { color: #484f58 !important; }
+
+.dash-dropdown-dark .Select-arrow,
 .Select-arrow { border-top-color: #8b949e !important; }
 
 /* ── Status bar ── */
@@ -316,3 +380,45 @@ body {
 ::-webkit-scrollbar-track { background: #0d1117; }
 ::-webkit-scrollbar-thumb { background: #30363d; border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: #484f58; }
+
+/* ── Tabs ── */
+.nav-tabs {
+    border-bottom: 1px solid #30363d !important;
+    background-color: #161b22;
+}
+
+.nav-tabs .nav-link {
+    color: #8b949e !important;
+    border: none !important;
+    border-bottom: 2px solid transparent !important;
+    border-radius: 0 !important;
+    padding: 10px 20px !important;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    font-weight: 500;
+    transition: color 0.15s, border-color 0.15s;
+}
+
+.nav-tabs .nav-link:hover {
+    color: #e6edf3 !important;
+    border-bottom-color: #30363d !important;
+    background: transparent !important;
+}
+
+.nav-tabs .nav-link.active {
+    color: #e6edf3 !important;
+    background-color: transparent !important;
+    border-bottom: 2px solid #388bfd !important;
+    font-weight: 600;
+}
+
+.tab-content {
+    background-color: #0d1117;
+}
+
+/* ── Dropdown simulador ── */
+#dd-sim-asset .Select-control *,
+#dd-sim-asset .Select-value,
+#dd-sim-asset .Select-value-label {
+    color: #000000 !important;
+}

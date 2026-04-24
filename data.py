@@ -249,3 +249,171 @@ def fmt_price(
     if value >= 1:
         return f"{symbol} {value:.4f}".rstrip("0").rstrip(".")
     return f"{symbol} {value:.6f}".rstrip("0").rstrip(".")
+
+
+# ─── Simulação de Dividendos ──────────────────────────────────
+
+# Tipos que NÃO suportam dividendos
+DIVIDEND_EXCLUDED_TYPES = {"crypto", "commodity", "index"}
+
+
+def get_dividend_simulation(
+    asset: dict[str, Any],
+    amount: float,
+    display_brl: bool,
+    fx_rate: float,
+) -> dict[str, Any]:
+    """
+    Simula um investimento em um ativo pagador de dividendos.
+
+    Retorna:
+      supported, price, units, actual_cost, remainder,
+      dividends_hist (list[{date, value}]), projected_annual,
+      dividend_yield, freq_label, error
+    """
+    result: dict[str, Any] = {
+        "supported":        False,
+        "price":            None,
+        "units":            0,
+        "actual_cost":      0.0,
+        "remainder":        amount,
+        "dividends_hist":   [],
+        "projected_annual": 0.0,
+        "dividend_yield":   0.0,
+        "freq_label":       "",
+        "error":            None,
+    }
+
+    if asset.get("type", "stock") in DIVIDEND_EXCLUDED_TYPES:
+        return result
+
+    result["supported"] = True
+    ticker        = asset["ticker"]
+    base_currency = asset.get("base_currency", "USD")
+    gram_convert  = asset.get("gram_convert", False)
+
+    try:
+        yf_obj = yf.Ticker(ticker)
+
+        # ── Preço atual ──────────────────────────────────────
+        info  = yf_obj.fast_info
+        price = float(info.last_price or info.previous_close or 0)
+        if gram_convert and price > 0:
+            price /= TROY_OUNCE_TO_GRAM
+
+        if price <= 0:
+            result["error"] = "Preço indisponível"
+            return result
+
+        price_display = price * fx_rate if (display_brl and base_currency == "USD") else price
+
+        units       = int(amount // price_display)
+        actual_cost = units * price_display
+        remainder   = amount - actual_cost
+
+        result.update(price=price_display, units=units,
+                      actual_cost=actual_cost, remainder=remainder)
+
+        if units == 0:
+            result["error"] = "Valor insuficiente para comprar 1 cota"
+            return result
+
+        # ── Dividendos históricos (últimos 12 meses) ─────────
+        divs = yf_obj.dividends
+        # yfinance pode retornar DataFrame ou Series dependendo da versão
+        if isinstance(divs, pd.DataFrame):
+            if "Dividends" in divs.columns:
+                divs = divs["Dividends"]
+            elif divs.columns.size > 0:
+                divs = divs.iloc[:, 0]
+            else:
+                divs = pd.Series(dtype=float)
+        if divs.empty:
+            result["error"] = "Sem histórico de dividendos"
+            return result
+
+        if divs.index.tz is not None:
+            divs.index = divs.index.tz_convert("UTC").tz_localize(None)
+
+        cutoff   = pd.Timestamp.now() - pd.DateOffset(months=12)
+        divs_12m = divs[divs.index >= cutoff]
+
+        if divs_12m.empty:
+            result["error"] = "Sem dividendos nos últimos 12 meses"
+            return result
+
+        div_fx           = fx_rate if (display_brl and base_currency == "USD") else 1.0
+        divs_12m_display = divs_12m * div_fx
+
+        result["dividends_hist"] = [
+            {"date": str(d.date()), "value": float(v)}
+            for d, v in divs_12m_display.items()
+        ]
+
+        n_payments = len(divs_12m)
+        result["freq_label"] = (
+            "Mensal"     if n_payments >= 10 else
+            "Trimestral" if n_payments >= 4  else
+            "Semestral"  if n_payments >= 2  else
+            "Anual"
+        )
+
+        avg_div          = float(divs_12m_display.mean())
+        projected_annual = avg_div * n_payments * units
+
+        result["projected_annual"] = projected_annual
+        result["dividend_yield"]   = (
+            avg_div * n_payments / price_display * 100
+            if price_display > 0 else 0.0
+        )
+
+    except Exception as exc:
+        result["error"] = str(exc)
+
+    return result
+
+
+# ─── Comm Lens – informações detalhadas do ativo ─────────────
+
+def get_asset_lens(asset: dict[str, Any]) -> dict[str, Any]:
+    """
+    Busca informações detalhadas e notícias recentes de um ativo via yfinance.
+    Retorna dict com 'info' (métricas) e 'news' (lista de notícias).
+    """
+    import re as _re
+
+    ticker = asset["ticker"]
+    result: dict[str, Any] = {"info": {}, "news": [], "error": None}
+
+    try:
+        obj  = yf.Ticker(ticker)
+        info = obj.info or {}
+
+        keep = [
+            "longName", "sector", "industry", "marketCap",
+            "trailingPE", "forwardPE", "priceToBook",
+            "dividendYield", "fiftyTwoWeekHigh", "fiftyTwoWeekLow",
+            "beta", "volume", "averageVolume",
+            "longBusinessSummary", "currency", "exchange",
+        ]
+        result["info"] = {k: info[k] for k in keep if k in info and info[k] is not None}
+
+        parsed = []
+        for n in (obj.news or [])[:5]:
+            c = n.get("content", {}) if isinstance(n, dict) else {}
+            title   = c.get("title", "")
+            summary = _re.sub(r"<[^>]+>", "", c.get("summary") or c.get("description") or "")[:220]
+            pub     = (c.get("pubDate") or "")[:10]
+            url     = (
+                (c.get("canonicalUrl")    or {}).get("url") or
+                (c.get("clickThroughUrl") or {}).get("url") or ""
+            )
+            if title:
+                parsed.append({"title": title, "summary": summary, "pubDate": pub, "url": url})
+
+        result["news"] = parsed
+
+    except Exception as exc:
+        result["error"] = str(exc)
+
+    return result
