@@ -16,6 +16,25 @@ Tela central do app. No topo ficam os **cards de preço** com cotação ao vivo,
 
 Aberto pelo botão **+ Ativo** no cabeçalho. Campos disponíveis:
 
+### Comm Lens — detalhes e notícias do ativo
+
+![Comm Lens](Images/lens.png)
+
+Modal que abre ao clicar em um card de ativo. Exibe dados fundamentalistas do ativo (Market Cap, Máx/Mín 52 semanas, Volume do dia, Volume médio e Bolsa), seguidos de uma seção **Notícias Recentes** com manchetes buscadas via Google News RSS (fallback Yahoo Finance), com título, trecho, fonte e data de cada artigo.
+
+### Simulador de Dividendos
+
+![Simulador de Dividendos](Images/simulador.png)
+
+Aba separada acessível pela navegação **Dashboard / Simulador** no topo. Permite informar um ativo (ações, ETFs, FIIs) e um valor a investir, e calcula:
+
+- **Cotas compradas** e **sobra** não investida
+- **Rend. anual projetado** com base nos dividendos históricos
+- **Dividend Yield** projetado (12 meses)
+- **Frequência** de pagamento (mensal, trimestral etc.)
+
+O gráfico de barras mostra o histórico de dividendos dos últimos 12 meses (azul) e a projeção para os próximos 12 meses (verde).
+
 | Campo | Descrição |
 |---|---|
 | **Ticker Yahoo Finance** | Código do ativo (ex: `MSFT`, `BTC-USD`, `^BVSP`, `GC=F`) |
@@ -38,6 +57,8 @@ Aberto pelo botão **+ Ativo** no cabeçalho. Campos disponíveis:
 - Botão **↺ Restaurar** para voltar aos ativos padrão
 - Relógio ao vivo e barra de status com horário da última atualização
 - Layout responsivo — funciona em mobile/iPhone
+- **Comm Lens**: modal com dados fundamentalistas + notícias recentes via Google News RSS (fallback Yahoo Finance)
+- **Simulador de Dividendos**: calcula cotas, rendimento anual projetado, dividend yield e frequência de pagamento com gráfico histórico/projeção
 
 ## Como rodar
 
@@ -63,8 +84,10 @@ config.py    — ativos padrão, períodos, tipos de ativo, constantes
 assets/
   custom.css — estilo dark theme
 Images/
-  Index.png  — screenshot do dashboard principal
-  Menu.png   — screenshot do modal de adição de ativo
+  Index.png      — screenshot do dashboard principal
+  Menu.png       — screenshot do modal de adição de ativo
+  lens.png       — screenshot do Comm Lens (detalhes + notícias)
+  simulador.png  — screenshot do Simulador de Dividendos
 ```
 
 ## Fontes de dados
@@ -95,4 +118,3 @@ gunicorn app:server
 - Alertas de preço
 - Seção de portfólio com valor total
 - Exportar histórico em CSV
-- Notícias do ativo via Google News RSS
