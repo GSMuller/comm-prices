@@ -1,5 +1,22 @@
 # comm-prices
 
+Plataforma pessoal para centralização e acompanhamento e análise de portfólio de investimentos em tempo real.
+
+A proposta é centralizar em um único lugar tudo que você precisa para gerenciar seus ativos: cotações ao vivo, análise técnica, indicadores fundamentalistas, notícias do mercado e simulações de rendimento. O usuário cadastra seus próprios ativos — ações, cripto, ETFs, FIIs, índices ou commodities — e a plataforma cuida do resto.
+
+Todos os dados são puxados em tempo real por múltiplas APIs:
+
+| Fonte | Dados |
+|---|---|
+| **Yahoo Finance** (`yfinance`) | Cotações, histórico OHLCV, câmbio USD/BRL, indicadores fundamentalistas |
+| **CoinGecko** | Preço spot e variação 24h de criptomoedas (sem API key) |
+| **Google News RSS** | Notícias recentes sobre cada ativo (fallback Yahoo Finance) |
+
+**Stack**: Python · Dash · Plotly · yFinance · CoinGecko · Google News RSS
+
+---
+
+
 Dashboard pra acompanhar preços de ativos em tempo real. Roda local, abre no browser.
 
 ## Telas
